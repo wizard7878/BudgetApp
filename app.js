@@ -273,7 +273,7 @@ var Controller = (function (budget_ctrl,ui_ctrl){
         // Get data from text boxs
         var get_inputs = ui_ctrl.get_inputs()
         // add data to Storage
-        if (get_inputs.value !== NaN && get_inputs.value !== undefined && get_inputs.value !== 0 && get_inputs.description !== "" ) {
+        if (get_inputs.value !== NaN  && get_inputs.value > 0 && get_inputs.description !== "" ) {
 
             var add_item = budget_ctrl.addItem(get_inputs.type,get_inputs.description,get_inputs.value)
             //add data to UI
