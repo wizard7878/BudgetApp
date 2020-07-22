@@ -71,7 +71,9 @@ function UIController(){
         btn_submit : '.add__btn',
         type: '.add__type',
         description : '.add__description',
-        value : '.add__value'
+        value : '.add__value',
+        income_Container : '.income__list',
+        expense_Container : '.expenses__list'
     }
 
 
@@ -92,6 +94,41 @@ function UIController(){
                 description:description,
                 value:value
             }
+        },
+
+        additem:function(id,type,description,value){
+            var html
+
+            if(type === 'inc'){
+                html = ` <div class="item clearfix" id="income-${id}">
+                <div class="item__description">${description}</div>
+                <div class="right clearfix">
+                    <div class="item__value">+ ${value}</div>
+                    <div class="item__delete">
+                        <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
+                    </div>
+                </div>
+            </div>`
+
+            document.querySelector(DomStrings.income_Container).insertAdjacentHTML('beforeend',html)
+            }
+
+            else if(type === 'exp'){
+
+                html = `<div class="item clearfix" id="expense-${id}">
+                <div class="item__description">${description}</div>
+                <div class="right clearfix">
+                    <div class="item__value">- ${value}</div>
+                    <div class="item__delete">
+                        <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
+                    </div>
+                </div>
+            </div>`
+
+            document.querySelector(DomStrings.expense_Container).insertAdjacentHTML('beforeend',html)
+            }
+
+            
         }
     }
 }
@@ -121,6 +158,7 @@ var Controller = (function (budget_ctrl,ui_ctrl){
         var get_inputs = ui_ctrl.get_inputs()
         
         var add_item = budget_ctrl.addItem(get_inputs.type,get_inputs.description,get_inputs.value)
+        ui_ctrl.additem(add_item.id,add_item.type,add_item.description,add_item.value)
     }
 
     return {
