@@ -129,6 +129,11 @@ function UIController(){
             }
 
             
+        },
+        clear_Fields : function(){
+            document.querySelector(DomStrings.value).value = ""
+            document.querySelector(DomStrings.description).value = ""
+            document.querySelector(DomStrings.description).focus()
         }
     }
 }
@@ -155,10 +160,14 @@ var Controller = (function (budget_ctrl,ui_ctrl){
 
 
     var input = function(){
+        // Get data from text boxs
         var get_inputs = ui_ctrl.get_inputs()
-        
+        // add data to Storage
         var add_item = budget_ctrl.addItem(get_inputs.type,get_inputs.description,get_inputs.value)
+        //add data to UI
         ui_ctrl.additem(add_item.id,add_item.type,add_item.description,add_item.value)
+        // Clear Textboxs
+        ui_ctrl.clear_Fields()
     }
 
     return {
