@@ -83,9 +83,10 @@ function BudgetController(){
         calculate_budget:function(){
             this.calculate_types('inc')
             this.calculate_types('exp')
-
+            var percentage = Math.round((data.totalItems.totals.exp / data.totalItems.totals.inc) * 100)
             data.totalItems.budget = data.totalItems.totals.inc - data.totalItems.totals.exp
             // console.log("BUDGET",data.totalItems)
+            data.totalItems.percentage = percentage
             return data.totalItems
         },
 
@@ -118,7 +119,9 @@ function UIController(){
         Income : '.budget__income--value',
         Expense : '.budget__expenses--value',
         Budget : '.budget__value',
-        Container : '.container'
+        percentage:'.budget__expenses--percentage',
+        Container : '.container',
+        date : '.budget__title--month'
 
     }
 
@@ -149,7 +152,7 @@ function UIController(){
                 html = ` <div class="item clearfix" id="inc-${id}">
                 <div class="item__description">${description}</div>
                 <div class="right clearfix">
-                    <div class="item__value">+ ${value}</div>
+                    <div class="item__value">+ ${value} $</div>
                     <div class="item__delete">
                         <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
                     </div>
@@ -164,7 +167,7 @@ function UIController(){
                 html = `<div class="item clearfix" id="exp-${id}">
                 <div class="item__description">${description}</div>
                 <div class="right clearfix">
-                    <div class="item__value">- ${value}</div>
+                    <div class="item__value">- ${value} $</div>
                     <div class="item__delete">
                         <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
                     </div>
@@ -182,15 +185,30 @@ function UIController(){
             document.querySelector(DomStrings.description).focus()
         },
 
-        update_budget:function(budget,income_budget,expense_budget){
+        update_budget:function(budget,income_budget,expense_budget,percentage){
             document.querySelector(DomStrings.Income).textContent = income_budget + "$" 
             document.querySelector(DomStrings.Expense).textContent = expense_budget + "$" 
             document.querySelector(DomStrings.Budget).textContent = budget + "$" 
+            document.querySelector(DomStrings.percentage).textContent = percentage + "%"
         },
 
         deleteItem:function(selector){
             var element = document.getElementById(selector)
             document.getElementById(selector).parentNode.removeChild(element)
+        },
+
+        displayDate:function(){
+            var months,year,month,date
+            months = ['January','February','March','April','May','June','July','August','September','October',
+                            'November','December']
+
+            date = new Date()
+            year = date.getFullYear()
+            month = date.getMonth()
+
+            document.querySelector(DomStrings.date).textContent = months[month] +" "+year
+            
+            
         }
     }
 }
@@ -215,10 +233,7 @@ var Controller = (function (budget_ctrl,ui_ctrl){
             }
         })
 
-        document.querySelector(Dom.Container).addEventListener('click',(event)=>{
-           
-
-        })
+        document.querySelector(Dom.Container).addEventListener('click',delete_item)
     }
 
 
@@ -237,7 +252,7 @@ var Controller = (function (budget_ctrl,ui_ctrl){
         var updates = budget_ctrl.calculate_budget()
         console.log(budget_ctrl.data.alldata)
         //update ui budget
-        ui_ctrl.update_budget(updates.budget,updates.totals.inc,updates.totals.exp)
+        ui_ctrl.update_budget(updates.budget,updates.totals.inc,updates.totals.exp,updates.percentage)
     }
 
 
@@ -246,7 +261,7 @@ var Controller = (function (budget_ctrl,ui_ctrl){
         var updated_data = budget_ctrl.calculate_budget()
         console.log(updated_data,'updated')
         //update budget UI
-        ui_ctrl.update_budget(updated_data.budget,updated_data.totals.inc,updated_data.totals.exp)
+        ui_ctrl.update_budget(updated_data.budget,updated_data.totals.inc,updated_data.totals.exp,updated_data.percentage)
     }
 
 
@@ -272,7 +287,8 @@ var Controller = (function (budget_ctrl,ui_ctrl){
         //Starting Point
         init:function(){
             setupEventListener()
-            ui_ctrl.update_budget(0,0,0)
+            ui_ctrl.update_budget(0,0,0,0),
+            ui_ctrl.displayDate()
             
             
         }
