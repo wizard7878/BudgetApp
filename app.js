@@ -54,9 +54,35 @@ function BudgetController(){
                 data.alldata[type].push(element)
             }
 
-            console.log(data.alldata)
+            console.log(data)
             return element  
+        },
+
+        calculate_types:function(type){
+            var sum,res;
+            if(data.alldata[type].length > 0){
+                sum = data.alldata[type].map(x => x.value)
+                
+                res = sum.reduce((current,pre) =>  {
+                    return current + pre
+                })
+
+                data.totals[type] = res
+                
+            }else{
+                data.totals[type] = 0
+            }
+        },
+
+        calculate_budget:function(){
+            this.calculate_types('inc')
+            this.calculate_types('exp')
+
+            data.budget = data.totals.inc - data.totals.exp
+            console.log("BUDGET",data.budget)
+            return data.budget
         }
+
     }
 
 }
@@ -73,7 +99,11 @@ function UIController(){
         description : '.add__description',
         value : '.add__value',
         income_Container : '.income__list',
-        expense_Container : '.expenses__list'
+        expense_Container : '.expenses__list',
+        Income : '.budget__income--value',
+        Expense : '.budget__expenses--value',
+        Budget : '.budget__value'
+
     }
 
 
@@ -86,7 +116,7 @@ function UIController(){
 
             type = document.querySelector(DomStrings.type).value
             description = document.querySelector(DomStrings.description).value
-            value = document.querySelector(DomStrings.value).value
+            value = parseFloat(document.querySelector(DomStrings.value).value)
 
 
             return {
@@ -98,7 +128,7 @@ function UIController(){
 
         additem:function(id,type,description,value){
             var html
-
+            
             if(type === 'inc'){
                 html = ` <div class="item clearfix" id="income-${id}">
                 <div class="item__description">${description}</div>
@@ -158,14 +188,23 @@ var Controller = (function (budget_ctrl,ui_ctrl){
         })
     }
 
+    function update_budget(){
+        budget_ctrl.calculate_budget()
+    }
+
 
     var input = function(){
         // Get data from text boxs
         var get_inputs = ui_ctrl.get_inputs()
         // add data to Storage
-        var add_item = budget_ctrl.addItem(get_inputs.type,get_inputs.description,get_inputs.value)
-        //add data to UI
-        ui_ctrl.additem(add_item.id,add_item.type,add_item.description,add_item.value)
+        if (get_inputs.value !== NaN && get_inputs.value !== undefined && get_inputs.value !== 0 && get_inputs.description !== "" ) {
+
+            var add_item = budget_ctrl.addItem(get_inputs.type,get_inputs.description,get_inputs.value)
+            //add data to UI
+            ui_ctrl.additem(add_item.id,add_item.type,add_item.description,add_item.value)
+
+            update_budget()
+        }
         // Clear Textboxs
         ui_ctrl.clear_Fields()
     }
@@ -173,6 +212,7 @@ var Controller = (function (budget_ctrl,ui_ctrl){
     return {
         init:function(){
             setupEventListener()
+            
             
         }
     }
