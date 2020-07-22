@@ -22,13 +22,19 @@ function BudgetController(){
             exp:[]
         },
 
-        totals :{
-            inc : 0,
-            exp : 0
-        },
+        totalItems :{
 
-        budget : 0,
-        percentage : 0
+            totals :{
+                inc : 0,
+                exp : 0
+            },
+    
+            budget : 0,
+            percentage : 0
+
+        }
+
+        
     }
 
 
@@ -54,7 +60,7 @@ function BudgetController(){
                 data.alldata[type].push(element)
             }
 
-            console.log(data)
+            // console.log(data)
             return element  
         },
 
@@ -67,10 +73,10 @@ function BudgetController(){
                     return current + pre
                 })
 
-                data.totals[type] = res
+                data.totalItems.totals[type] = res
                 
             }else{
-                data.totals[type] = 0
+                data.totalItems.totals[type] = 0
             }
         },
 
@@ -78,9 +84,9 @@ function BudgetController(){
             this.calculate_types('inc')
             this.calculate_types('exp')
 
-            data.budget = data.totals.inc - data.totals.exp
-            console.log("BUDGET",data.budget)
-            return data.budget
+            data.totalItems.budget = data.totalItems.totals.inc - data.totalItems.totals.exp
+            // console.log("BUDGET",data.totalItems)
+            return data.totalItems
         }
 
     }
@@ -164,7 +170,13 @@ function UIController(){
             document.querySelector(DomStrings.value).value = ""
             document.querySelector(DomStrings.description).value = ""
             document.querySelector(DomStrings.description).focus()
-        }
+        },
+
+        update_budget:function(budget,income_budget,expense_budget){
+            document.querySelector(DomStrings.Income).textContent = income_budget + "$" 
+            document.querySelector(DomStrings.Expense).textContent = expense_budget + "$" 
+            document.querySelector(DomStrings.Budget).textContent = budget + "$" 
+        },
     }
 }
 
@@ -189,7 +201,11 @@ var Controller = (function (budget_ctrl,ui_ctrl){
     }
 
     function update_budget(){
-        budget_ctrl.calculate_budget()
+        //update budget
+        var updated_data = budget_ctrl.calculate_budget()
+        console.log(updated_data,'updated')
+        //update budget UI
+        ui_ctrl.update_budget(updated_data.budget,updated_data.totals.inc,updated_data.totals.exp)
     }
 
 
@@ -212,6 +228,7 @@ var Controller = (function (budget_ctrl,ui_ctrl){
     return {
         init:function(){
             setupEventListener()
+            ui_ctrl.update_budget(0,0,0)
             
             
         }
