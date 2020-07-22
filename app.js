@@ -47,7 +47,7 @@ function BudgetController(){
             }
 
             else {
-                id = data.alldata[type][data.alldata[type].length - 1].id + 1
+                id = parseInt(data.alldata[type][data.alldata[type].length - 1].id + 1)
             }
 
             if(type === 'inc'){
@@ -87,7 +87,16 @@ function BudgetController(){
             data.totalItems.budget = data.totalItems.totals.inc - data.totalItems.totals.exp
             // console.log("BUDGET",data.totalItems)
             return data.totalItems
-        }
+        },
+
+        delete_item:function(Id,type){
+            var element,index ;
+            element = data.alldata[type].map(x => x.id)
+            index = element.indexOf(Id)
+            data.alldata[type].splice(index,1)
+         
+        },
+        data:data
 
     }
 
@@ -108,7 +117,8 @@ function UIController(){
         expense_Container : '.expenses__list',
         Income : '.budget__income--value',
         Expense : '.budget__expenses--value',
-        Budget : '.budget__value'
+        Budget : '.budget__value',
+        Container : '.container'
 
     }
 
@@ -136,7 +146,7 @@ function UIController(){
             var html
             
             if(type === 'inc'){
-                html = ` <div class="item clearfix" id="income-${id}">
+                html = ` <div class="item clearfix" id="inc-${id}">
                 <div class="item__description">${description}</div>
                 <div class="right clearfix">
                     <div class="item__value">+ ${value}</div>
@@ -151,7 +161,7 @@ function UIController(){
 
             else if(type === 'exp'){
 
-                html = `<div class="item clearfix" id="expense-${id}">
+                html = `<div class="item clearfix" id="exp-${id}">
                 <div class="item__description">${description}</div>
                 <div class="right clearfix">
                     <div class="item__value">- ${value}</div>
@@ -177,6 +187,11 @@ function UIController(){
             document.querySelector(DomStrings.Expense).textContent = expense_budget + "$" 
             document.querySelector(DomStrings.Budget).textContent = budget + "$" 
         },
+
+        deleteItem:function(selector){
+            var element = document.getElementById(selector)
+            document.getElementById(selector).parentNode.removeChild(element)
+        }
     }
 }
 
@@ -187,6 +202,7 @@ function UIController(){
 // Global app Controller
 var Controller = (function (budget_ctrl,ui_ctrl){
     var Dom = ui_ctrl.Dom_Selectors
+
     function setupEventListener(){
         document.querySelector(Dom.btn_submit).addEventListener('click',()=>{
             console.log("Clicked")
@@ -198,7 +214,32 @@ var Controller = (function (budget_ctrl,ui_ctrl){
                 input()
             }
         })
+
+        document.querySelector(Dom.Container).addEventListener('click',(event)=>{
+           
+
+        })
     }
+
+
+    function delete_item(event){
+        var ID,arr,type,id
+        ID = event.target.parentNode.parentNode.parentNode.parentNode.id
+
+        arr = ID.split('-')
+        type = arr[0]
+        id = parseInt(arr[1])
+        //delete item from datas
+        budget_ctrl.delete_item(id,type)
+        //delete item from UI
+        ui_ctrl.deleteItem(ID)
+        //Re-calculate budget
+        var updates = budget_ctrl.calculate_budget()
+        console.log(budget_ctrl.data.alldata)
+        //update ui budget
+        ui_ctrl.update_budget(updates.budget,updates.totals.inc,updates.totals.exp)
+    }
+
 
     function update_budget(){
         //update budget
@@ -207,6 +248,7 @@ var Controller = (function (budget_ctrl,ui_ctrl){
         //update budget UI
         ui_ctrl.update_budget(updated_data.budget,updated_data.totals.inc,updated_data.totals.exp)
     }
+
 
 
     var input = function(){
@@ -223,9 +265,11 @@ var Controller = (function (budget_ctrl,ui_ctrl){
         }
         // Clear Textboxs
         ui_ctrl.clear_Fields()
+        console.log(budget_ctrl.data.alldata)
     }
 
     return {
+        //Starting Point
         init:function(){
             setupEventListener()
             ui_ctrl.update_budget(0,0,0)
