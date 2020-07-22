@@ -189,6 +189,9 @@ function UIController(){
             document.querySelector(DomStrings.Income).textContent = income_budget + "$" 
             document.querySelector(DomStrings.Expense).textContent = expense_budget + "$" 
             document.querySelector(DomStrings.Budget).textContent = budget + "$" 
+            if(percentage === 0)
+                document.querySelector(DomStrings.percentage).textContent = "---"
+            else
             document.querySelector(DomStrings.percentage).textContent = percentage + "%"
         },
 
