@@ -1,3 +1,3 @@
 ## BudgetApp With JavaScript Dom 
 
-#Open index.html to use it.
+Open index.html to use it.
